@@ -1,3 +1,7 @@
+import java.util.Queue;
+import java.util.Stack;
+import java.util.LinkedList;
+
 class Main {
     public static void printMap(int w, int h) {
         if(w % 2 == 0 || h % 2 == 0) {
@@ -9,15 +13,12 @@ class Main {
         boolean increasing=true;
         for(int i=0; i<h; i++) {
             for(int j=0; j<(w-numSharp)/2; j++) {
-                //System.out.print("#");
                 img[pixelIndex++] = '#';
             }
             for(int j=0; j<numSharp; j++) {
-                //System.out.print("_");
                 img[pixelIndex++] = '_';
             }
             for(int j=0; j<(w-numSharp)/2; j++) {
-                //System.out.print("#");
                 img[pixelIndex++] = '#';
             }
             if(increasing) {
@@ -37,29 +38,32 @@ class Main {
         printPixels(img, w, h);
     }
 
-    //private static int debugCount = 0;
-
     public static void click(char to, int x, int y, char[] img, int w, int h) {
         final char from = img[y*w+x];
         fill(from, to, x, y, img, w, h);
     }
+
+    static class Px {
+        public int x, y;
+        public Px(int x, int y) {
+            this.x=x;
+            this.y=y;
+        }
+    }
+
     public static void fill(char from, char to, int x, int y, char[] img, int w, int h) {
-        //if(debugCount >= 4) return;
-        //System.out.println(String.format("%s -> %s at (%d, %d)", from, to, x, y));
-        //debugCount++;
-        if(img[y*w+x] == from) {
-            img[y*w+x] = to;
-            if(canFill(from, x+1, y, img, w, h)) {
-                fill(from, to, x+1, y, img, w, h);
-            }
-            if(canFill(from, x-1, y, img, w, h)) {
-                fill(from, to, x-1, y, img, w, h);
-            }
-            if(canFill(from, x, y+1, img, w, h)) {
-                fill(from, to, x, y+1, img, w, h);
-            }
-            if(canFill(from, x, y-1, img, w, h)) {
-                fill(from, to, x, y-1, img, w, h);
+        //final Queue<Px> pixels = new LinkedList<Px>();
+        final Stack<Px> pixels = new Stack<Px>();
+        pixels.push(new Px(x, y));
+
+        while(pixels.size() > 0) {
+            final Px p = pixels.pop();
+            if(canFill(from, p.x, p.y, img, w, h)) {
+                img[p.y*w+p.x] = to;
+                pixels.push(new Px(p.x+1, p.y));
+                pixels.push(new Px(p.x-1, p.y));
+                pixels.push(new Px(p.x, p.y+1));
+                pixels.push(new Px(p.x, p.y-1));
             }
         }
     }
@@ -67,11 +71,14 @@ class Main {
         if(x<0 || y<0) return false;
         if(x>=w || y>=h) return false;
         int index = y*w+x;
-        if(index >= 0 && index < img.length) {
+        if(inBounds(index, img)) {
             return img[index] == target;
         } else {
             return false;
         }
+    }
+    private static boolean inBounds(int index, char[] img) {
+        return index >= 0 && index < img.length;
     }
     public static void printPixels(char[] img, int w, int  h) {
         for(int i=0; i<h; i++) {
@@ -82,6 +89,8 @@ class Main {
         }
     }
     public static void main(String[] args) {
+        //printMap(3, 3);
         printMap(5, 5);
+        //printMap(513, 513);
     }
 }
