@@ -31,11 +31,18 @@ class Main {
         }
 
         printPixels(img, w, h);
-        fill('_', '@', 3, 3, img, w, h);
-        //fill('#', '@', 0, 0, img, w, h);
+        click('%', 0, 0, img, w, h);
+        click('@', 3, 3, img, w, h);
+        click('%', 4, 4, img, w, h);
         printPixels(img, w, h);
     }
-    private static int debugCount = 0;
+
+    //private static int debugCount = 0;
+
+    public static void click(char to, int x, int y, char[] img, int w, int h) {
+        final char from = img[y*w+x];
+        fill(from, to, x, y, img, w, h);
+    }
     public static void fill(char from, char to, int x, int y, char[] img, int w, int h) {
         //if(debugCount >= 4) return;
         //System.out.println(String.format("%s -> %s at (%d, %d)", from, to, x, y));
@@ -58,6 +65,7 @@ class Main {
     }
     private static boolean canFill(char target, int x, int y, char[] img, int w, int h) {
         if(x<0 || y<0) return false;
+        if(x>=w || y>=h) return false;
         int index = y*w+x;
         if(index >= 0 && index < img.length) {
             return img[index] == target;
